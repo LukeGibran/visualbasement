@@ -1,45 +1,61 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+/**
+ * * Base CSS
+ */
+import './App.css';
+
+/**
+ * * Material UI
+ */
+import { CssBaseline, Box, Typography } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+/**
+ * * Components
+ */
+import Form from './components/Form';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#363c94',
+    },
+    secondary: {
+      main: '#f6c53f',
+    },
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.jsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className='App'>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+          }}
+        >
+          <Typography color='primary' variant='h3' component='div'>
+            Welcome! 🎊
+          </Typography>
+          <Typography
+            color='secondary'
+            variant='subtitle'
+            component='div'
           >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+            Visual Basement
+          </Typography>
+          <br />
+
+          <Form />
+        </Box>
+      </ThemeProvider>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
