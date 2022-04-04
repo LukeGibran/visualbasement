@@ -1,42 +1,51 @@
+import { useState, useEffect } from 'react';
+
 // Material UI
 import {
   Card,
   Box,
   CardContent,
   TextField,
-  Select,
   MenuItem,
   FormControl,
-  InputLabel,
   Button,
 } from '@mui/material';
 
-// Formik
-import { useFormik } from 'formik';
-import validationSchema from '../helpers/YupValidation';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import { updateData, setLoading } from '.././redux/data/data.actions';
+import { allData, isLoading } from '.././redux/data/data.selector';
 
-/**
- * * Validation Schema use for checking the
- * * values in Formik
- */
-
-const Form = () => {
-  const formik = useFormik({
-    initialValues: {
-      firstname: '',
-      lastname: '',
-      email: '',
-      accounts: '',
-      gender: '',
-      testimonial: '',
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
-    },
+const Form = ({ updateData, Data, isLoading, setLoading }) => {
+  const [data, setData] = useState({
+    firstName: '',
+    lastName: '',
+    age: '',
+    emailAddress: '',
+    gender: '',
   });
 
-  return (
+  useEffect(() => {
+      let objectData = {}
+      !isLoading && Data.forEach((d) => {
+          objectData[d.fieldName] = d.value
+      })
+      !isLoading && setData(objectData)
+  }, [Data]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading()
+    updateData(data)
+  };
+
+  const handleChange = (e) => {
+    setData({...data, [e.target.name]: e.target.value });
+  };
+
+  return isLoading ? (
+    <h3>Loading ⌚</h3>
+  ) : (
     <Box
       sx={{
         minWidth: 475,
@@ -55,104 +64,70 @@ const Form = () => {
         }}
       >
         <CardContent>
-          <form onSubmit={formik.handleSubmit}>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='firstname'
-                name='firstname'
-                label='First Name'
-                variant='outlined'
-                color='primary'
-                fullWidth
-                value={formik.values.firstname}
-                onChange={formik.handleChange}
-                error={formik.touched.firstname && Boolean(formik.errors.firstname)}
-                helperText={formik.touched.firstname && formik.errors.firstname}
-              />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='lastname'
-                name='lastname'
-                label='Last Name'
-                variant='outlined'
-                color='secondary'
-                fullWidth
-                value={formik.values.lastname}
-                onChange={formik.handleChange}
-                error={formik.touched.lastname && Boolean(formik.errors.lastname)}
-                helperText={formik.touched.lastname && formik.errors.lastname}
-              />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='email'
-                name='email'
-                label='Email'
-                variant='outlined'
-                color='primary'
-                fullWidth
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-              />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='accounts'
-                name='accounts'
-                label='Accounts'
-                variant='outlined'
-                color='secondary'
-                fullWidth
-                value={formik.values.accounts}
-                onChange={formik.handleChange}
-                error={formik.touched.accounts && Boolean(formik.errors.accounts)}
-                helperText={formik.touched.accounts && formik.errors.accounts}
-              />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='gender'
-                select
-                label='Gender'
-                color='primary'
-                name="gender"
-                value={formik.values.gender}
-                onChange={formik.handleChange}
-                error={formik.touched.gender && Boolean(formik.errors.gender)}
-                helperText={formik.touched.gender && formik.errors.gender}
-              >
-                <MenuItem value='male'>male</MenuItem>
-                <MenuItem value='femail'>female</MenuItem>
-              </TextField>
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <TextField
-                id='testimonial'
-                label='Testimonials'
-                multiline
-                rows={3}
-                color='secondary'
-                name="testimonial"
-                value={formik.values.testimonial}
-                onChange={formik.handleChange}
-                error={formik.touched.testimonial && Boolean(formik.errors.testimonial)}
-                helperText={formik.touched.testimonial && formik.errors.testimonial}
-              />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: '100%' }}>
-              <Button
-                color='primary'
-                variant='contained'
-                fullWidth
-                type='submit'
-                size='large'
-              >
-                Submit
-              </Button>
-            </FormControl>
+          <form onSubmit={handleSubmit}>
+            {!isLoading &&
+              Data.map((d, i) => {
+                console.log(d.fieldName);
+                return d.fieldName === 'gender' ? (
+                  <FormControl sx={{ m: 1, width: '100%' }} key={i}>
+                    <TextField
+                      id='gender'
+                      select
+                      label='Gender'
+                      color='primary'
+                      name='gender'
+                      value={data.gender}
+                      onChange={handleChange}
+                    >
+                      {d.options.map((option, i) => (
+                        <MenuItem value={option} key={i}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </FormControl>
+                ) : d.fieldName === 'age' ? (
+                  <FormControl sx={{ m: 1, width: '100%' }} key={i}>
+                    <TextField
+                      id='age'
+                      name='age'
+                      label='Age'
+                      variant='outlined'
+                      type='number'
+                      color='secondary'
+                      fullWidth
+                      value={data.age}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
+                ) : (
+                  <FormControl sx={{ m: 1, width: '100%' }} key={i}>
+                    <TextField
+                      id={d.fieldName}
+                      name={d.fieldName}
+                      label={d.fieldName}
+                      variant='outlined'
+                      color={i % 2 === 0 ? 'secondary' : 'primary'}
+                      fullWidth
+                      value={data[d.fieldName]}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
+                );
+              })}
+            {!isLoading && (
+              <FormControl sx={{ m: 1, width: '100%' }}>
+                <Button
+                  color='primary'
+                  variant='contained'
+                  fullWidth
+                  type='submit'
+                  size='large'
+                >
+                  Submit
+                </Button>
+              </FormControl>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -160,4 +135,14 @@ const Form = () => {
   );
 };
 
-export default Form;
+const mapStateToProps = createStructuredSelector({
+  Data: allData,
+  isLoading: isLoading,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateData: (data) => dispatch(updateData(data)),
+  setLoading: () => dispatch(setLoading())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);

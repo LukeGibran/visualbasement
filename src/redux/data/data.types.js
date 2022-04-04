@@ -1,0 +1,6 @@
+export const DataActionTypes = {
+    GET_ALL_DATA: 'GET_ALL_DATA',
+    UPDATE_DATA: 'UPDATE_DATA',
+    SET_LOADING: 'SET_LOADING',
+    DATA_ERROR: 'DATA_ERROR'
+}
